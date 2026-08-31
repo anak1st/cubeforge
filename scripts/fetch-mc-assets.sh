@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # 下载 MC 官方 client.jar，全量资源解压到 temp/minecraft/（浏览用工作区），
-# 再把当前需要的资源按原相对路径挑选到 public/texture/minecraft/（挑选清单见下方 PICKS）。
-# temp/minecraft/<路径> 与 public/texture/minecraft/<路径> 一一对应，复制时不改相对路径。
-# Mojang 版权资产仅限本机自用：temp/ 与 public/texture/ 均不入库（CREDITS.md）。
+# 再把当前需要的资源按原相对路径挑选到 public/（挑选清单见下方 PICKS）。
+# temp/minecraft/<路径> 与 public/<路径> 一一对应，复制时不改相对路径。
+# Mojang 版权资产仅限本机自用：temp/ 与 public/textures/ 均不入库（CREDITS.md）。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TEMP="$ROOT/temp/minecraft"
-DEST="$ROOT/public/texture/minecraft"
+DEST="$ROOT/public"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -46,5 +46,5 @@ for p in "${PICKS[@]}"; do
   cp "$TEMP/$p" "$DEST/$p"
 done
 
-echo "==> 完成：$DEST/ 现有 $(find "$DEST" -type f | wc -l | tr -d ' ') 个文件"
+echo "==> 完成：挑选 ${#PICKS[@]} 个文件到 $DEST/"
 echo "    全量工作区（可随时浏览挑选）：$TEMP/"

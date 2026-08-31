@@ -8,14 +8,14 @@
 ```
 client.jar (Mojang CDN, ~40MB)
   └─ scripts/fetch-mc-assets.sh
-       ├─ temp/minecraft/            全量解压（45MB，gitignore，可随时浏览；含 .extracted 标记免重复下载）
-       └─ public/texture/minecraft/  挑选的文件按原相对路径一一映射落位
+       ├─ temp/minecraft/   全量解压（45MB，gitignore，可随时浏览；含 .extracted 标记免重复下载）
+       └─ public/           挑选的文件按原相对路径一一映射落位
 ```
 
-- **放置规则**：`temp/minecraft/<路径>` 与 `public/texture/minecraft/<路径>` 一一对应，复制时不改相对路径；需要新资源时在脚本的 `PICKS` 清单加一行即可。
+- **放置规则**：`temp/minecraft/<路径>` 与 `public/<路径>` 一一对应，复制时不改相对路径；需要新资源时在脚本的 `PICKS` 清单加一行即可。
 - temp 里保留 jar 内 assets/minecraft 的原始目录结构（`textures/`、`models/`、`lang/`…），方便对照原版文档找东西。
 
-## 当前挑选清单（public/texture/minecraft/）
+## 当前挑选清单（public/）
 
 | 文件 | 用途 |
 |---|---|

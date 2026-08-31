@@ -12,7 +12,7 @@
 ## 当前实现
 
 - 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm）
-- three.js 演示场景：黑底自转方块，分层接线 `src/render/scene.ts`（three，`createDemoScene(canvas)` 返回释放函数）→ `src/ui/SceneCanvas.tsx`（React 承载 canvas）→ `src/ui/App.tsx`
+- three.js 演示场景：黑底自转草方块（原版贴图 + 生物群系染色），分层接线 `src/render/scene.ts`（three，`createDemoScene(canvas)` 返回释放函数）→ `src/ui/SceneCanvas.tsx`（React 承载 canvas）→ `src/ui/App.tsx`
 - 资源脚本：`scripts/fetch-mc-assets.sh`（获取 Minecraft 官方资源）、`scripts/fetch-refs.sh`（浅克隆参考仓库）
 - 里程碑路线与人工验收清单：[docs/plan.md](docs/plan.md)（当前推进至 M1）
 

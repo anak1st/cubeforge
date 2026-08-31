@@ -21,9 +21,9 @@
 ## 当前实现
 
 - 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm，精确版本锁 `package.json`）
-- `src/render/scene.ts`：three.js 演示场景（黑底自转方块），`createDemoScene(canvas)` 返回释放函数
+- `src/render/scene.ts`：three.js 演示场景（黑底自转草方块，原版贴图 + 生物群系染色），`createDemoScene(canvas)` 返回释放函数
 - `src/ui/`：`SceneCanvas`（React 承载 canvas 的范式）+ `App`（全屏容器 + 标题角标）
-- 资源脚本：`scripts/fetch-mc-assets.sh`（MC 全量资源解压到 `temp/minecraft/`，按原相对路径挑选到 `public/texture/minecraft/`）、`scripts/fetch-refs.sh`（参考仓库浅克隆）
+- 资源脚本：`scripts/fetch-mc-assets.sh`（MC 全量资源解压到 `temp/minecraft/`，按原相对路径挑选到 `public/`）、`scripts/fetch-refs.sh`（参考仓库浅克隆）
 - 里程碑进度与人工验收清单见 `docs/plan.md`，当前任务见 `TODO.md`
 
 ## 分层规则（最重要）
