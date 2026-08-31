@@ -65,5 +65,7 @@ pnpm lint       # ESLint
 
 - [docs/plan.md](docs/plan.md) —— 里程碑计划表与人工验收清单
 - [docs/luanti.md](docs/luanti.md) —— Luanti 源码深度分析（算法与架构蓝本）
+- [docs/voxelize.md](docs/voxelize.md) —— Voxelize 源码深度分析（同栈 TS/three.js 引擎，实现可直接移植）
+- [docs/comparison.md](docs/comparison.md) —— 综合分析：两个参考对象逐维度对照与 cubeforge 取向
 - [TODO.md](TODO.md) —— 当前里程碑的任务清单
 - [AGENTS.md](AGENTS.md) —— AI 协作约定（分层规则、工作流、完成定义）

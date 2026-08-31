@@ -73,9 +73,12 @@ pnpm preview     # 预览产物
 
 | 要做什么 | 先看 |
 |---|---|
+| 子系统设计决策/取向 | `docs/comparison.md`（逐维度对照表，实现与取向不符时回来更新） |
 | chunk/方块注册表/网格生成 | `docs/luanti.md` §3 §5，`refs/luanti/src/mapblock.h` `src/nodedef.h` |
-| 光照 BFS / 昼夜 | `docs/luanti.md` §7，`refs/luanti/src/light.h` `src/daynightratio.h` |
-| 碰撞 / 射线拾取 | `docs/luanti.md` §8 §9，`refs/luanti/src/collision.cpp` `src/raycast.cpp` |
-| 物品/合成/库存 | `docs/luanti.md` §10，`refs/luanti/src/craftdef.h` |
+| 贪心网格合并 / WASM mesher 范式 | `docs/voxelize.md` §4，`refs/voxelize/crates/mesher/src/mesher/greedy.rs` |
+| AABB/扫掠碰撞/射线（可直接 vendor 的纯 TS 包） | `docs/voxelize.md` §7，`refs/voxelize/packages/aabb` `physics-engine` `raycast` |
+| 光照 BFS / 昼夜 | `docs/luanti.md` §7，`refs/luanti/src/light.h` `src/daynightratio.h`；作业化封装见 `docs/voxelize.md` §5 |
+| 碰撞 / 射线拾取（算法对照） | `docs/luanti.md` §8 §9，`refs/luanti/src/collision.cpp` `src/raycast.cpp` |
+| 物品/合成/库存 | `docs/luanti.md` §10，`refs/luanti/src/craftdef.h`；槽位状态机见 `docs/voxelize.md` §10 |
 | 存档格式 | `docs/luanti.md` §13，`refs/luanti/doc/world_format.md` |
 | UI/背包/菜单 | `docs/luanti.md` §14 |
