@@ -1,6 +1,9 @@
 # Voxelize 源码深度分析
 
-> 本文档只分析 Voxelize 引擎本身：它是什么、每个子系统怎么实现、数据如何组织、算法细节是什么。与 Luanti 的对比、以及对 cubeforge 的借鉴结论统一放在 [docs/comparison.md](comparison.md)。
+> **上游**：<https://github.com/voxelize/voxelize> · 授权 MIT
+> **本地源码**：`refs/voxelize`（只读，`scripts/fetch-refs.sh` 浅克隆获取）；记录时点 `d84a174`（2026-08-31）
+>
+> 本文档只分析 Voxelize 引擎本身：它是什么、每个子系统怎么实现、数据如何组织、算法细节是什么。
 > 所有类名、位布局、算法行为均核实自 `refs/voxelize` 源码（v3.0.0，浅克隆）。
 
 ---
@@ -276,4 +279,4 @@ class RawChunk {
 
 ---
 
-*基于 `refs/voxelize` v3.0.0 浅克隆撰写；2026-08-31。与 Luanti 的对比及对 cubeforge 的借鉴映射见 [docs/comparison.md](comparison.md)。*
+*基于 `refs/voxelize` v3.0.0 撰写；2026-08-31。*

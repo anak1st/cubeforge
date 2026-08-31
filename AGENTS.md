@@ -1,13 +1,15 @@
 # AGENTS.md — AI 协作约定
 
-本文件是 AI 编码代理在本仓库工作时的常驻上下文。每次会话开始先读完本文件；与用户指令冲突时以用户指令为准，冲突本身要向用户指出。
+本文件是 AI 编码代理在本仓库工作时的常驻上下文。
 
-## 项目是什么
+## 目标
 
-浏览器端体素实验游戏（Minecraft-like），目的是学习体素引擎核心算法。架构蓝本是 Luanti（原 Minetest）：
+浏览器端体素实验游戏（Minecraft-like），目的是学习体素引擎核心算法：分块世界、网格生成、BFS 光照、DDA 射线、AABB 碰撞。
 
-- **算法与架构参考**：`docs/luanti.md`（各子系统"问题 → Luanti 做法 → 自研要点"）
-- **参考源码**：`refs/luanti`、`refs/minetest_game`（只读克隆，禁止修改、禁止提交、禁止 import 进工程）
+两个参考对象，选择性借鉴、不做整体复刻：
+
+- **Luanti**（原 Minetest，C++）——机制参考：边界处理、光照、碰撞等"标准答案"，源码只读克隆于 `refs/luanti`
+- **Voxelize**（TypeScript + three.js 同栈）——实现参考：算法可直接移植，源码只读克隆于 `refs/voxelize`
 
 ## 硬约束（不要提议突破）
 
@@ -16,11 +18,13 @@
 3. 仅桌面浏览器，键鼠操作 —— 不做移动端适配
 4. 单机实验项目 —— 不过度工程化（不引 monorepo、不造抽象层）
 
-## 技术栈与版本
+## 当前实现
 
-- TypeScript strict + Vite 8 + pnpm；渲染 three.js（WebGL）；UI React 19 + zustand（仅限 `ui/`）+ Tailwind CSS 4（用户指定，官方 Vite 插件方式，无 config 文件）；测试 vitest
-- **依赖审核门禁（用户规则）：新增任何依赖（含 devDependencies）必须先向用户说明必要性并获得批准**，已批准清单见 `TODO.md`；不升级依赖大版本
-- 已锁定版本见 `package.json` / `pnpm-lock.yaml`；加依赖时锁定精确版本
+- 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm，精确版本锁 `package.json`）
+- `src/render/scene.ts`：three.js 演示场景（黑底自转方块），`createDemoScene(canvas)` 返回释放函数
+- `src/ui/`：`SceneCanvas`（React 承载 canvas 的范式）+ `App`（全屏容器 + 标题角标）
+- 资源脚本：`scripts/fetch-mc-assets.sh`（MC 全量资源解压到 `temp/minecraft/`，按原相对路径挑选到 `public/texture/minecraft/`）、`scripts/fetch-refs.sh`（参考仓库浅克隆）
+- 里程碑进度与人工验收清单见 `docs/plan.md`，当前任务见 `TODO.md`
 
 ## 分层规则（最重要）
 
@@ -34,7 +38,7 @@ src/workers/  Worker 入口                  只消费 core
 ```
 
 - 依赖方向单向：`ui → game → core`，禁止反向、禁止跨层（如 `render → ui`）
-- ⚠️ 截至 M0，**ESLint 分层禁令尚未配置**（配置本身是 TODO.md 的任务）。配置完成前请自觉遵守：写 `core/` 代码时不得出现任何浏览器/渲染依赖
+- ⚠️ **ESLint 分层禁令尚未配置**（TODO.md 任务）。配置完成前请自觉遵守：写 `core/` 代码时不得出现任何浏览器/渲染依赖
 - 每帧更新的数据（FPS、坐标显示）不得进入 React state——用 ref 直接写 DOM
 
 ## 命令
@@ -56,11 +60,10 @@ pnpm preview     # 预览产物
 
 ## 工作流：里程碑制
 
-- `docs/plan.md` 是唯一事实源：里程碑顺序、任务、**人工验收清单**都以它为准
-- 一个里程碑 ≈ 一次 AI 会话的范围；开场读 plan.md 对应章节 + luanti.md 相关章节 + 本文件
+- `docs/plan.md` 是唯一事实源：里程碑顺序、任务、人工验收清单都以它为准
+- 一个里程碑 ≈ 一次 AI 会话的范围；开场读 plan.md 对应章节 + 本文件
 - **人的角色是验收员**：AI 产出代码 + 测试 + "待验收"状态，人按清单在浏览器里操作并记录
 - 验收不通过时，修复会话只修清单上的失败项，不做清单之外的重构
-- 降级预案（光照收光、Worker、IndexedDB 等）按 plan.md 风险表执行，不自行改方案
 
 ## 代码风格
 
@@ -69,16 +72,6 @@ pnpm preview     # 预览产物
 - 注释只写"为什么/约束"，不写"这段代码在做什么"；公开 API 写 TSDoc 一行
 - 提交信息用中文，格式 `feat|fix|docs|test|refactor: 描述`；里程碑完成打 `Mxx` tag
 
-## 常见任务对照
+## 依赖门禁
 
-| 要做什么 | 先看 |
-|---|---|
-| 子系统设计决策/取向 | `docs/comparison.md`（逐维度对照表，实现与取向不符时回来更新） |
-| chunk/方块注册表/网格生成 | `docs/luanti.md` §3 §5，`refs/luanti/src/mapblock.h` `src/nodedef.h` |
-| 贪心网格合并 / WASM mesher 范式 | `docs/voxelize.md` §4，`refs/voxelize/crates/mesher/src/mesher/greedy.rs` |
-| AABB/扫掠碰撞/射线（可直接 vendor 的纯 TS 包） | `docs/voxelize.md` §7，`refs/voxelize/packages/aabb` `physics-engine` `raycast` |
-| 光照 BFS / 昼夜 | `docs/luanti.md` §7，`refs/luanti/src/light.h` `src/daynightratio.h`；作业化封装见 `docs/voxelize.md` §5 |
-| 碰撞 / 射线拾取（算法对照） | `docs/luanti.md` §8 §9，`refs/luanti/src/collision.cpp` `src/raycast.cpp` |
-| 物品/合成/库存 | `docs/luanti.md` §10，`refs/luanti/src/craftdef.h`；槽位状态机见 `docs/voxelize.md` §10 |
-| 存档格式 | `docs/luanti.md` §13，`refs/luanti/doc/world_format.md` |
-| UI/背包/菜单 | `docs/luanti.md` §14 |
+新增任何依赖（含 devDependencies）必须先向用户说明必要性并获得批准；加依赖锁精确版本，不升级大版本。

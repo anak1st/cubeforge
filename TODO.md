@@ -1,20 +1,17 @@
 # TODO — M0 工程骨架与开发回路
 
-> 目标：空壳工程，但"改代码 → 看到效果"的回路完全建立。预计 0.5 天。
+> 目标：空壳工程，但"改代码 → 看到效果"的回路完全建立。
 > 详细背景见 `docs/plan.md`（M0 章节）。本步完成并验收后，再开 M1。
->
-> 状态更新（2026-08-31）：脚手架已由初始化会话完成（Vite 8 + React 19.2.8 + TS 6.0 + ESLint 10 + git），
-> README/AGENTS/.gitignore(refs/) 已补齐。以下为**剩余任务**。
 
 ## 已完成 ✅
 
 - [x] 脚手架：Vite 8 + React 19 + TS + ESLint(flat) + pnpm（`package.json`、`tsconfig.*`、`eslint.config.js`）
-- [x] `git init`、基础 `.gitignore`（已追加 `refs/` 防止 215MB 参考仓库误提交）
+- [x] `git init`、基础 `.gitignore`
 - [x] 脚本：`dev` / `build`(tsc -b + vite build) / `lint` / `preview`
 - [x] `README.md`（项目介绍 + 里程碑状态表）、`AGENTS.md`（AI 协作约定）
-- [x] 设计文档：`docs/plan.md`、`docs/luanti.md`
-- [x] Tailwind CSS 4.3（用户指定引入，替代原 CSS Modules 方案；官方 Vite 插件方式，无 config 文件）
-- [x] three.js 0.185 + `@types/three`（用户指定提前引入，原计划 M3；官方方式：npm 安装 + ESM 导入，`main.tsx` 有 REVISION 冒烟日志）
+- [x] 设计文档：`docs/plan.md`、`docs/refs/luanti.md`
+- [x] Tailwind CSS 4.3（官方 Vite 插件方式，无 config 文件）
+- [x] three.js 0.185 + `@types/three`（npm 安装 + ESM 导入）
 
 ## 1. 补齐工具链
 
@@ -25,7 +22,7 @@
 
 ## 2. 分层结构
 
-- [x] 现有模板入口已重构：`src/ui/App.tsx`（占位首页）+ `src/main.tsx`（装配入口）；~~建空目录~~（**按用户要求不预留空目录，各层目录随首个文件一起创建**）
+- [x] 现有模板入口已重构：`src/ui/App.tsx`（占位首页）+ `src/main.tsx`（装配入口）；各层目录随首个文件一起创建，不预留空目录
 - [ ] ESLint 分层禁令（`eslint.config.js` 加 `no-restricted-imports` 按目录配置；目录出现于下表时机）：
   - `src/core/**`（M2 创建）禁止：`three`、`react`、`react-dom`
   - `src/render/**`（M1 创建）、`src/game/**`（M1 创建）禁止：`react`、`react-dom`
