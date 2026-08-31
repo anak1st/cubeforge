@@ -13,6 +13,8 @@
 - [x] 脚本：`dev` / `build`(tsc -b + vite build) / `lint` / `preview`
 - [x] `README.md`（项目介绍 + 里程碑状态表）、`AGENTS.md`（AI 协作约定）
 - [x] 设计文档：`docs/plan.md`、`docs/luanti.md`
+- [x] Tailwind CSS 4.3（用户指定引入，替代原 CSS Modules 方案；官方 Vite 插件方式，无 config 文件）
+- [x] three.js 0.185 + `@types/three`（用户指定提前引入，原计划 M3；官方方式：npm 安装 + ESM 导入，`main.tsx` 有 REVISION 冒烟日志）
 
 ## 1. 补齐工具链
 
@@ -21,21 +23,20 @@
 - [ ] `package.json` 增加 `"engines": { "node": ">=22" }`
 - [ ] 核对 `tsconfig.app.json` 确认 `strict: true`（模板默认应有，确认即可）
 
-## 2. 分层目录与强制规则
+## 2. 分层结构
 
-- [ ] 建目录：`src/{core,render,game,ui,workers}`、`public/textures/`、`docs/qa/`
-- [ ] 现有 `src/main.tsx`、`App.tsx` 迁入新结构：`src/ui/App.tsx` + `src/main.ts`（装配入口）
-- [ ] ESLint 分层禁令（`eslint.config.js` 加 `no-restricted-imports` 按目录配置）：
-  - `src/core/**` 禁止：`three`、`react`、`react-dom`（DOM 全局已由禁 import 覆盖，另加 `no-restricted-globals` 拦 `document/window`）
-  - `src/render/**`、`src/game/**` 禁止：`react`、`react-dom`
-  - `src/ui/**` 禁止：`three`
+- [x] 现有模板入口已重构：`src/ui/App.tsx`（占位首页）+ `src/main.tsx`（装配入口）；~~建空目录~~（**按用户要求不预留空目录，各层目录随首个文件一起创建**）
+- [ ] ESLint 分层禁令（`eslint.config.js` 加 `no-restricted-imports` 按目录配置；目录出现于下表时机）：
+  - `src/core/**`（M2 创建）禁止：`three`、`react`、`react-dom`
+  - `src/render/**`（M1 创建）、`src/game/**`（M1 创建）禁止：`react`、`react-dom`
+  - `src/ui/**` 已存在，禁止：`three`
 - [ ] 违规冒烟测试：在 `src/core/` 临时 `import * as THREE from "three"`，确认 `pnpm lint` 报错，然后删除
 
-## 3. 占位应用（三件套各露一面）
+## 3. 占位应用
 
-- [ ] `src/ui/App.tsx`：替换模板计数器页 → 标题 "cubeforge" + 副标题（后续里程碑替换成主菜单）
+- [x] `src/ui/App.tsx`：已替换为最小占位页（Tailwind 原子类，标题 "cubeforge"）
+- [x] 删除模板残留资源（`App.css`、`src/assets/*`、`public/icons.svg`），保留 `public/favicon.svg`
 - [ ] `src/ui/debug.ts`：Tweakpane 面板挂载（空分组即可）+ FPS 计数（自写 rAF 统计）
-- [ ] 删除模板残留资源（`src/assets/react.svg`、`App.css` 计数器样式等）
 
 ## 4. 测试回路
 

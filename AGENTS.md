@@ -18,8 +18,8 @@
 
 ## 技术栈与版本
 
-- TypeScript strict + Vite 8 + pnpm；渲染 three.js（WebGL）；UI React 19 + zustand（仅限 `ui/`）；测试 vitest
-- **不升级依赖大版本、不引入上面清单之外的重型库**（物理引擎、状态管理框架、UI 框架等）；需要新依赖时先说明理由征求同意
+- TypeScript strict + Vite 8 + pnpm；渲染 three.js（WebGL）；UI React 19 + zustand（仅限 `ui/`）+ Tailwind CSS 4（用户指定，官方 Vite 插件方式，无 config 文件）；测试 vitest
+- **依赖审核门禁（用户规则）：新增任何依赖（含 devDependencies）必须先向用户说明必要性并获得批准**，已批准清单见 `TODO.md`；不升级依赖大版本
 - 已锁定版本见 `package.json` / `pnpm-lock.yaml`；加依赖时锁定精确版本
 
 ## 分层规则（最重要）
