@@ -1,59 +1,21 @@
-# TODO — M0 工程骨架与开发回路
+# TODO — 当前进度
 
-> 目标：空壳工程，但"改代码 → 看到效果"的回路完全建立。
-> 详细背景见 `docs/plan.md`（M0 章节）。本步完成并验收后，再开 M1。
+> 详细背景见 `docs/plan.md`。当前状态:**M2 世界数据模型已实现 + 测试,待人工验收**。
 
-## 已完成 ✅
+## M2 · 世界数据模型(实现完毕,待验收)
 
-- [x] 脚手架：Vite 8 + React 19 + TS + ESLint(flat) + pnpm（`package.json`、`tsconfig.*`、`eslint.config.js`）
-- [x] `git init`、基础 `.gitignore`
-- [x] 脚本：`dev` / `build`(tsc -b + vite build) / `lint` / `preview`
-- [x] `README.md`（项目介绍 + 里程碑状态表）、`AGENTS.md`（AI 协作约定）
-- [x] 设计文档：`docs/plan.md`、`docs/refs/luanti.md`
-- [x] Tailwind CSS 4.3（官方 Vite 插件方式，无 config 文件）
-- [x] three.js 0.185 + `@types/three`（npm 安装 + ESM 导入）
+- [x] `src/core/blocks.ts`:方块注册表(`BlockDef` + id↔名字双向映射 + solid/transparent 查表),air/stone/dirt/grass/sand/leaves/water 七种占位
+- [x] `src/core/chunk.ts`:16³ Chunk(`Uint16Array` id + `Uint8Array` light 预留 param1);三级坐标换算(位运算,负数正确);局部坐标与 id 范围校验
+- [x] `src/core/world.ts`:chunk 容器;`getBlock`(缺失 chunk → air)、`setBlock`(缺失 chunk 抛错、未注册 id 抛错)、`ensureChunk`(生成路径)
+- [x] vitest 用例 20 个:坐标往返(含负数)、越界/非整数/NaN 防护、跨 chunk 读写(三轴 8 chunk 不串扰)、16³ 全 0 初始化、注册表双向映射与查错
+- [x] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿;core 纯度 `grep -rn "three\|document\|window" src/core/` 零结果
+- [ ] **人工验收**(plan.md M2 清单):① `pnpm test` 全绿;② 对照上方用例清单核对测试存在;③ 亲跑 grep 确认 core 纯度。通过后写 `docs/qa/M2.md` → `git tag M2`
 
-## 1. 补齐工具链
+## M0 收尾(遗留)
 
-- [ ] 安装 `vitest`、`tweakpane`（`idb` 留到 M7）
-- [ ] `package.json` 增加脚本：`"test": "vitest run"`、`"typecheck": "tsc -b --noEmit"`
-- [ ] `package.json` 增加 `"engines": { "node": ">=22" }`
-- [ ] 核对 `tsconfig.app.json` 确认 `strict: true`（模板默认应有，确认即可）
-
-## 2. 分层结构
-
-- [x] 现有模板入口已重构：`src/ui/App.tsx`（占位首页）+ `src/main.tsx`（装配入口）；各层目录随首个文件一起创建，不预留空目录
-- [ ] ESLint 分层禁令（`eslint.config.js` 加 `no-restricted-imports` 按目录配置；目录出现于下表时机）：
-  - `src/core/**`（M2 创建）禁止：`three`、`react`、`react-dom`
-  - `src/render/**`（M1 创建）、`src/game/**`（M1 创建）禁止：`react`、`react-dom`
-  - `src/ui/**` 已存在，禁止：`three`
-- [ ] 违规冒烟测试：在 `src/core/` 临时 `import * as THREE from "three"`，确认 `pnpm lint` 报错，然后删除
-
-## 3. 占位应用
-
-- [x] `src/ui/App.tsx`：已替换为最小占位页（Tailwind 原子类，标题 "cubeforge"）
-- [x] 删除模板残留资源（`App.css`、`src/assets/*`、`public/icons.svg`），保留 `public/favicon.svg`
-- [x] FPS 计数：并入主循环统计——`src/game/loop.ts` 持有全项目唯一 rAF，就地写入全局白板 `src/game/stats.ts`；`src/ui/FpsCounter` 500ms 拉取写 DOM（不进 state）
-  - ⚠️ `createMainLoop` 是 M1 的循环骨架，此处提前落地；M1 会话只需接入固定步长累加器与 `onTick`
-- [ ] `src/ui/debug.ts`：Tweakpane 面板挂载（空分组即可；依赖待批准，monitor 可直接绑 `GameStats`）
-
-## 4. 测试回路
-
-- [ ] vitest 最小配置，写 `src/core/smoke.test.ts`（内容随意，目的是打通 `pnpm test` 回路）
-
-## 5. 收尾
-
-- [ ] 提交当前改动（README/AGENTS/TODO/.gitignore/docs）
-- [ ] 跑下面人工验收清单 → `docs/qa/M0.md` 验收记录 → `git tag M0`
-
-## 人工验收清单（来自 docs/plan.md M0，全部通过才算完成）
-
-| # | 操作 | 预期 |
-|---|---|---|
-| 1 | `pnpm dev` 打开提示的地址 | 浏览器显示标题页 + FPS 显示 + 调试面板 |
-| 2 | 修改 `App.tsx` 标题文字并保存 | 浏览器 1 秒内自动更新（HMR），无需手动刷新 |
-| 3 | `pnpm test && pnpm lint && pnpm typecheck` | 全部通过 |
-| 4 | 在 `src/core/` 加 `import * as THREE from "three"` 跑 lint | lint 报错拦截（验证分层规则生效） |
-| 5 | `pnpm build && pnpm preview` | 产物页面正常打开 |
-
-**完成后**：`git tag M0` → 开 M1（场景/相机/调试面板，见 `docs/plan.md`）。
+- [x] vitest ^4.1.11(devDependency,`^` 版本范围);`test` / `typecheck` 脚本;~~`engines` 字段~~ 经用户决定不加(2026-09-01)
+- [x] tsconfig strict:TS 6.0 起默认开启(实测:隐式 any 与可空检查在无配置时均报错),无需显式写 `"strict": true`,文档措辞已同步
+- [x] 测试回路打通(由 M2 真实用例取代原计划的 smoke.test.ts)
+- [x] ~~ESLint 分层禁令~~ **经用户决定(2026-09-01)不配置**:ESLint 保持模板基础配置;分层规则仍为硬约定,靠评审与验收 grep 守卫(已记入 AGENTS.md)
+- [ ] Tweakpane 面板(随 M1 一并做)
+- [ ] 提交当前改动;M0 人工验收清单 → `docs/qa/M0.md` → `git tag M0`(清单里"调试面板"一项依赖 Tweakpane,与 M1 一并验收)

@@ -31,6 +31,7 @@
 18. [线程与性能工程](#18-线程与性能工程)
 19. [从零写一款 MC 的路线图](#19-从零写一款-mc-的路线图)
 20. [关键文件索引与术语对照](#20-关键文件索引与术语对照)
+21. [附录：Minetest Game 内容包](#21-附录minetest-game-内容包)
 
 ---
 
@@ -588,6 +589,18 @@ TCP/UDP + 自定协议，先做"服务器权威 + 块同步 + 媒体下发"（§
 | 资源包 | 材质包 texture pack | |
 | 数据包/模组 | mod / game | game=mod 的官方捆包 |
 | 附魔 | 无内建（meta 实现） | |
+
+## 21. 附录：Minetest Game 内容包
+
+Luanti 引擎的官方默认游戏包，本地只读克隆于 `refs/minetest_game`（上游 <https://github.com/luanti-org/minetest_game>，浅克隆 `--depth 1`，记录时点 `c42e4d0`）。它是体素游戏"内容层"长什么样（方块定义、合成、贴图组织）的活教材。授权：代码 LGPL 2.1+；媒体（贴图/音效）CC BY-SA 3.0，署名要求见各 `mods/*/README.txt`。
+
+| 主题 | 位置 |
+|---|---|
+| 方块定义（tiles 写法、硬度、光照参数） | `mods/default/nodes.lua` |
+| 物品定义 | `mods/default/craftitems.lua` |
+| 合成配方 | `mods/default/crafting.lua` |
+| 方块贴图（447 个，CC BY-SA 3.0） | `mods/default/textures/` |
+| 各贴图作者清单（CC BY-SA 署名要求） | `mods/*/README.txt` |
 
 ---
 

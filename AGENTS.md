@@ -6,10 +6,10 @@
 
 浏览器端体素实验游戏（Minecraft-like），目的是学习体素引擎核心算法：分块世界、网格生成、BFS 光照、DDA 射线、AABB 碰撞。
 
-两个参考对象，选择性借鉴、不做整体复刻：
+参照（选择性借鉴、不做整体复刻），按用途分层：
 
-- **Luanti**（原 Minetest，C++）——机制参考：边界处理、光照、碰撞等"标准答案"，源码只读克隆于 `refs/luanti`
-- **Voxelize**（TypeScript + three.js 同栈）——实现参考：算法可直接移植，源码只读克隆于 `refs/voxelize`
+- **Minecraft 官方代码**（反编译产物 `temp/minecraft-src/`，分析见 `docs/refs/minecraft.md`）——**世界行为的主要参照**：草方块染色、光照范围等机制规格以此为准
+- **Luanti** 与 **Voxelize**（均 `refs/` 只读克隆，后者为 TypeScript + three.js 同栈）——性能优化与工程实现参考
 
 ## 硬约束（不要提议突破）
 
@@ -17,17 +17,6 @@
 2. 无 mod/插件系统 —— 不设计脚本接口
 3. 仅桌面浏览器，键鼠操作 —— 不做移动端适配
 4. 单机实验项目 —— 不过度工程化（不引 monorepo、不造抽象层）
-
-## 当前实现
-
-- 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm，精确版本锁 `package.json`）
-- `src/render/scene.ts`：three.js 演示场景（黑底自转草方块，原版贴图 + 生物群系染色），`createDemoScene(canvas)` 返回 `{ renderFrame, dispose }`——场景不持有循环
-- `src/game/loop.ts`：主循环骨架（M0 提前落地的 M1 部分），全项目唯一 rAF；固定步长累加器 M1 接入
-- `src/game/stats.ts`：全局帧统计白板（fps/frameMs/tps，fps 经 EMA 平滑），循环就地写入、UI 低频拉取
-- `src/game/game.ts`：唯一装配点 `createGame(canvas)`（场景 + 循环），纯 TS 无 hooks
-- `src/ui/`：`GameView`（React 拥有 canvas，effect 里 createGame/dispose）+ `FpsCounter`（500ms 拉取白板写 DOM）+ `App`（页面壳：画布/标题/角标为平级兄弟，M7 菜单照此加入）
-- 资源脚本：`scripts/fetch-mc-assets.{sh,ps1}`（固定版本 MC 资源全量解压到 `temp/minecraft/`，按原相对路径挑选到 `public/`；sh 跑在 Mac、ps1 跑在 Windows）、`scripts/fetch-refs.{sh,ps1}`（参考仓库最小克隆）
-- 里程碑进度与人工验收清单见 `docs/plan.md`，当前任务见 `TODO.md`
 
 ## 分层规则（最重要）
 
@@ -40,11 +29,6 @@ src/ui/       React 组件、zustand store    禁止 import three
 src/workers/  Worker 入口                  只消费 core
 ```
 
-- 依赖方向单向：`ui → game → render → core`，禁止反向、禁止跨层（如 `render → ui`）
-- `src/ui/**` 禁止 import `three`；`src/game/**` 只经 `render` 间接使用 three，不得直接 import
-- ⚠️ **ESLint 分层禁令尚未配置**（TODO.md 任务）。配置完成前请自觉遵守：写 `core/` 代码时不得出现任何浏览器/渲染依赖
-- 每帧更新的数据（FPS、坐标显示）不得进入 React state——用 ref 直接写 DOM
-
 ## 命令
 
 ```bash
@@ -52,19 +36,20 @@ pnpm dev         # 开发服务器
 pnpm build       # tsc -b && vite build
 pnpm lint        # ESLint
 pnpm preview     # 预览产物
-# M0 完成后新增：pnpm test（vitest）、pnpm typecheck（tsc --noEmit）
+pnpm test        # vitest run
+pnpm typecheck   # tsc -b
 ```
 
 ## 完成定义（Definition of Done）
 
-1. `pnpm lint && pnpm build` 全绿（M0 后加 `&& pnpm test && pnpm typecheck`）
+1. `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿
 2. `src/core/` 的每个新算法/数据结构都有对应 vitest 用例
 3. 人工验收清单（`docs/plan.md` 对应里程碑章节）全部通过
 4. `TODO.md` 勾选完成项；`docs/qa/Mxx.md` 写验收记录；`git tag Mxx`
 
 ## 工作流：里程碑制
 
-- `docs/plan.md` 是唯一事实源：里程碑顺序、任务、人工验收清单都以它为准
+- `docs/plan.md` 是唯一事实源：里程碑顺序、任务、人工验收清单都以它为准；当前任务与进度见 `TODO.md`
 - 一个里程碑 ≈ 一次 AI 会话的范围；开场读 plan.md 对应章节 + 本文件
 - **人的角色是验收员**：AI 产出代码 + 测试 + "待验收"状态，人按清单在浏览器里操作并记录
 - 验收不通过时，修复会话只修清单上的失败项，不做清单之外的重构
@@ -78,4 +63,4 @@ pnpm preview     # 预览产物
 
 ## 依赖门禁
 
-新增任何依赖（含 devDependencies）必须先向用户说明必要性并获得批准；加依赖锁精确版本，不升级大版本。
+新增任何依赖（含 devDependencies）必须先向用户说明必要性并获得批准。
