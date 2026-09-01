@@ -94,7 +94,15 @@ export function createGame(canvas: HTMLCanvasElement, options: GameOptions): Gam
   window.addEventListener('keyup', onKeyUp)
 
   const requestLock = (): void => {
-    void canvas.requestPointerLock()
+    // unadjustedMovement 绕过系统鼠标加速与增量取整(macOS 默认锁量化 movementX/Y,慢速转动视角发顿)
+    try {
+      canvas
+        .requestPointerLock({ unadjustedMovement: true })
+        .catch(() => void canvas.requestPointerLock()) // 平台不支持 raw 输入被拒 → 退回默认锁
+    } catch {
+      // 运行时不返回 Promise 的引擎(如 Safari)取不到 .catch → 直接默认锁
+      void canvas.requestPointerLock()
+    }
   }
   setPhase('start')
 

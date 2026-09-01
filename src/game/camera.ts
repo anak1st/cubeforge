@@ -21,7 +21,6 @@ export interface FlyInput {
 
 export interface CameraController {
   readonly camera: THREE.PerspectiveCamera
-  speed: number
   /** 累积一次鼠标增量视角(不立即生效,由 render 帧消费) */
   turn(dx: number, dy: number): void
   /** 固定 tick 步进:用当前朝向推进逻辑位置(模拟帧) */
@@ -34,10 +33,10 @@ export interface CameraController {
 
 const PITCH_LIMIT = Math.PI / 2 - 0.001
 const SENSITIVITY = 0.0022 // 弧度/像素
+const FLY_SPEED = 12 // 格/秒
 
 export function createCameraController(camera: THREE.PerspectiveCamera): CameraController {
   camera.rotation.order = 'YXZ'
-  let speed = 12
 
   let yaw = 0
   let pitch = 0
@@ -51,12 +50,6 @@ export function createCameraController(camera: THREE.PerspectiveCamera): CameraC
 
   return {
     camera,
-    get speed(): number {
-      return speed
-    },
-    set speed(v: number) {
-      speed = v
-    },
     turn(dx: number, dy: number): void {
       pendingYaw -= dx * SENSITIVITY
       pendingPitch -= dy * SENSITIVITY
@@ -78,7 +71,7 @@ export function createCameraController(camera: THREE.PerspectiveCamera): CameraC
       const ud = (input.up ? 1 : 0) - (input.down ? 1 : 0)
 
       dir.set(fx * fb + rx * rl, ud, fz * fb + rz * rl)
-      if (dir.lengthSq() > 0) pos.addScaledVector(dir.normalize(), speed * dt)
+      if (dir.lengthSq() > 0) pos.addScaledVector(dir.normalize(), FLY_SPEED * dt)
     },
     render(alpha: number): void {
       // 每渲染帧消费鼠标增量(对应 MC turnPlayer),保证转向不被 tick 量化

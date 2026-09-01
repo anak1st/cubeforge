@@ -64,7 +64,7 @@ interface MeshData { positions: Float32Array; normals: Float32Array; uvs: Float3
 ### 飞行相机（game/camera.ts）
 
 - Pointer Lock：点击开始/继续时 `requestPointerLock`；`pointerlockchange` 锁丢失 → 自动暂停（ESC 由浏览器退锁，天然不做 keydown 拦截）。
-- 视角：movementX/Y → yaw/pitch；WASD 沿 yaw 水平移动，Space/Shift 升降，滚轮调速。
+- 视角：movementX/Y → yaw/pitch；WASD 沿 yaw 水平移动，Space/Shift 升降。滚轮调速挂账至 M5（随第一人称移动重做）。
 - 位置由主循环 `onTick`（固定步长，M1 累加器接线）按 dt 积分；无碰撞。
 - **相机对象归属 render**：`createWorldScene` 返回 `camera`，game 拿到引用驱动，保持 scene 只负责 three 装配。
 
@@ -93,7 +93,7 @@ interface MeshData { positions: Float32Array; normals: Float32Array; uvs: Float3
 
 1. `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿。
 2. `src/core/` 新增 mesher/terrain 均有 vitest 用例；`grep -rn "three\|document\|window" src/core/` 零命中。
-3. 浏览器人工：加载见开始菜单 → 点开始 → 见一个小岛（草顶/泥/石侧面清晰区分）→ WASD/滚轮/Space/Shift 飞行流畅、视角可控 → ESC 弹出暂停菜单 → 点"继续"回到飞行、画面不重置 → 点"返回菜单"回开始页。
+3. 浏览器人工：加载见开始菜单 → 点开始 → 见一个小岛（草顶/泥/石侧面清晰区分）→ WASD/Space/Shift 飞行流畅、视角可控 → ESC 弹出暂停菜单 → 点"继续"回到飞行、画面不重置 → 点"返回菜单"回开始页。
 4. 角标 FPS ≈ 刷新率；无 Console 报错。
 5. 通过后写 `docs/qa/` 记录 + 打 tag（**plan.md 里程碑总览不动**，本切片在 TODO 追踪；tag 名称实现前定，不强行冒充 `M3` 全量）。
 
