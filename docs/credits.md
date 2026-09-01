@@ -3,7 +3,7 @@
 ## Minecraft 官方资源（`public/textures/` 与 `temp/minecraft/`）
 
 提取自 Mojang 官方客户端 26.2（`client.jar`，经 `scripts/fetch-mc-assets.sh` 从 Mojang 官方 CDN 获取，2026-08-31）。
-全量解压在 `temp/minecraft/`（工作区），仅挑选必要的资源落位到 `public/`。逐类分析与挑选清单见 [`docs/assets/minecraft.md`](docs/assets/minecraft.md)。
+全量解压在 `temp/minecraft/`（工作区），仅挑选必要的资源落位到 `public/`。逐类分析与挑选清单见 [`docs/assets/minecraft.md`](assets/minecraft.md)。
 
 - **版权**：© Mojang Studios / Microsoft，保留所有权利。非开源、不可再分发。
 - **使用范围**：仅限本机学习自用。`temp/` 与 `public/textures/` 均已 gitignore，**不入库、不进分发产物**；新克隆请运行获取脚本。

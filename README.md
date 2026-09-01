@@ -13,7 +13,7 @@
 
 - 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm）
 - three.js 演示场景：黑底自转草方块（原版贴图 + 生物群系染色），分层接线 `src/render/scene.ts`（three，`createDemoScene(canvas)` 返回释放函数）→ `src/ui/SceneCanvas.tsx`（React 承载 canvas）→ `src/ui/App.tsx`
-- 资源脚本：`scripts/fetch-mc-assets.sh`（获取 Minecraft 官方资源）、`scripts/fetch-refs.sh`（浅克隆参考仓库）
+- 参考仓库脚本：`scripts/fetch-refs.sh`（浅克隆到 `refs/`）
 - 里程碑路线与人工验收清单：[docs/plan.md](docs/plan.md)（当前推进至 M1）
 
 ## 开发
@@ -26,4 +26,8 @@ pnpm preview    # 预览产物
 pnpm lint       # ESLint
 ```
 
-素材授权见 [CREDITS.md](CREDITS.md)，当前任务见 [TODO.md](TODO.md)。
+当前任务见 [TODO.md](TODO.md)。
+
+## 许可证
+
+代码以 [MIT](LICENSE) 授权。

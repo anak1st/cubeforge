@@ -1,7 +1,7 @@
 # Minecraft 官方资源 · 描述与分析
 
 > 版本 26.2。
-> 来源：Mojang 官方 CDN 的 `client.jar`。**版权资产仅限本机自用，不入库不分发**——见仓库根 [`CREDITS.md`](../CREDITS.md)。
+> 来源：Mojang 官方 CDN 的 `client.jar`。**版权资产仅限本机自用，不入库不分发**——见 [`docs/credits.md`](../credits.md)。
 
 ## 资源流：全量工作区 → 挑选落位
 

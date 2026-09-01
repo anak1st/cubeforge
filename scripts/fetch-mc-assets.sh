@@ -2,7 +2,7 @@
 # 下载 MC 官方 client.jar，全量资源解压到 temp/minecraft/（浏览用工作区），
 # 再把当前需要的资源按原相对路径挑选到 public/（挑选清单见下方 PICKS）。
 # temp/minecraft/<路径> 与 public/<路径> 一一对应，复制时不改相对路径。
-# Mojang 版权资产仅限本机自用：temp/ 与 public/textures/ 均不入库（CREDITS.md）。
+# Mojang 版权资产仅限本机自用：temp/ 与 public/textures/ 均不入库（docs/credits.md）。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

@@ -26,7 +26,7 @@ dist-ssr
 # Local reference clones（锚定根目录，否则会误伤 docs/refs/）
 /refs/
 
-# 资源挑选落位目录（Mojang 版权资产，仅本机自用：CREDITS.md、docs/assets/minecraft.md；获取方式 scripts/fetch-mc-assets.sh）
+# 资源挑选落位目录（仅本机自用，说明见 docs/credits.md 与 docs/assets/minecraft.md）
 /public/textures/
 
 # 全量资源解压工作区（scripts/fetch-mc-assets.sh 生成，含 Mojang 版权资产）
