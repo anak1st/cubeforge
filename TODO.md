@@ -33,7 +33,9 @@
 
 - [x] `src/ui/App.tsx`：已替换为最小占位页（Tailwind 原子类，标题 "cubeforge"）
 - [x] 删除模板残留资源（`App.css`、`src/assets/*`、`public/icons.svg`），保留 `public/favicon.svg`
-- [ ] `src/ui/debug.ts`：Tweakpane 面板挂载（空分组即可）+ FPS 计数（自写 rAF 统计）
+- [x] FPS 计数：并入主循环统计——`src/game/loop.ts` 持有全项目唯一 rAF，`GameStats` 就地更新；角标 500ms 拉取 ref 写 DOM（ui→game，不进 state）
+  - ⚠️ `createMainLoop` 是 M1 的循环骨架，此处提前落地；M1 会话只需接入固定步长累加器与 `onTick`
+- [ ] `src/ui/debug.ts`：Tweakpane 面板挂载（空分组即可；依赖待批准，monitor 可直接绑 `GameStats`）
 
 ## 4. 测试回路
 

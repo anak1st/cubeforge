@@ -21,8 +21,9 @@
 ## 当前实现
 
 - 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm，精确版本锁 `package.json`）
-- `src/render/scene.ts`：three.js 演示场景（黑底自转草方块，原版贴图 + 生物群系染色），`createDemoScene(canvas)` 返回释放函数
-- `src/ui/`：`SceneCanvas`（React 承载 canvas 的范式）+ `App`（全屏容器 + 标题角标）
+- `src/render/scene.ts`：three.js 演示场景（黑底自转草方块，原版贴图 + 生物群系染色），`createDemoScene(canvas)` 返回 `{ renderFrame, dispose }`——场景不持有循环
+- `src/game/loop.ts`：主循环骨架（M0 提前落地的 M1 部分），全项目唯一 rAF；帧统计就地写入 `GameStats`（fps/frameMs/tps），固定步长累加器 M1 接入
+- `src/ui/`：`SceneCanvas`（装配点：注入 renderFrame、把 `GameStats` 交给角标）+ `FpsCounter`（500ms 拉取写 DOM）+ `App`（全屏容器 + 标题角标）
 - 资源脚本：`scripts/fetch-mc-assets.{sh,ps1}`（固定版本 MC 资源全量解压到 `temp/minecraft/`，按原相对路径挑选到 `public/`；sh 跑在 Mac、ps1 跑在 Windows）、`scripts/fetch-refs.{sh,ps1}`（参考仓库最小克隆）
 - 里程碑进度与人工验收清单见 `docs/plan.md`，当前任务见 `TODO.md`
 

@@ -36,11 +36,17 @@ function tinted(img: HTMLImageElement, color: string): HTMLCanvasElement {
   return canvas
 }
 
+/** 演示场景的对外面：renderFrame 交由 game 层主循环驱动；dispose 回收全部 GPU 资源与监听器 */
+export interface DemoScene {
+  renderFrame(timeMs: number): void
+  dispose(): void
+}
+
 /**
  * 在给定 canvas 上创建演示场景：黑底 + 自转的原版贴图草方块。
- * 返回释放函数：回收全部 GPU 资源与监听器；canvas 本身归 React 所有，此处不碰 DOM。
+ * 场景不持有循环——canvas 本身归 React 所有，此处不碰 DOM。
  */
-export function createDemoScene(canvas: HTMLCanvasElement): () => void {
+export function createDemoScene(canvas: HTMLCanvasElement): DemoScene {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // 高分屏上限 2：再高只烧性能
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -118,20 +124,20 @@ export function createDemoScene(canvas: HTMLCanvasElement): () => void {
   }
   window.addEventListener('resize', onResize)
 
-  // 缓慢翻滚：顶面、侧面、底面都能被看到
-  renderer.setAnimationLoop((time) => {
-    if (cube) {
-      cube.rotation.y = time * 0.0004
-      cube.rotation.x = time * 0.00015
-    }
-    renderer.render(scene, camera)
-  })
-
-  return () => {
-    disposed = true
-    renderer.setAnimationLoop(null)
-    window.removeEventListener('resize', onResize)
-    for (const d of disposables) d.dispose()
-    renderer.dispose()
+  return {
+    // 缓慢翻滚：顶面、侧面、底面都能被看到
+    renderFrame(time: number): void {
+      if (cube) {
+        cube.rotation.y = time * 0.0004
+        cube.rotation.x = time * 0.00015
+      }
+      renderer.render(scene, camera)
+    },
+    dispose() {
+      disposed = true
+      window.removeEventListener('resize', onResize)
+      for (const d of disposables) d.dispose()
+      renderer.dispose()
+    },
   }
 }
