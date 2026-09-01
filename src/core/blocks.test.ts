@@ -8,8 +8,8 @@ import {
   BLOCK_WATER,
   blockId,
   blockName,
-  isSolid,
-  isTransparent,
+  canOcclude,
+  hasCollision,
 } from './blocks'
 
 describe('方块注册表', () => {
@@ -32,13 +32,23 @@ describe('方块注册表', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it('属性抽查:石头实心不透明,树叶实心但透明,水非固体', () => {
-    expect(isSolid(BLOCK_STONE)).toBe(true)
-    expect(isTransparent(BLOCK_STONE)).toBe(false)
-    expect(isSolid(BLOCK_LEAVES)).toBe(true)
-    expect(isTransparent(BLOCK_LEAVES)).toBe(true)
-    expect(isSolid(BLOCK_WATER)).toBe(false)
-    expect(isTransparent(BLOCK_WATER)).toBe(true)
+  it('属性抽查:石头碰撞且遮挡,树叶碰撞但不遮挡,水既不碰撞也不遮挡', () => {
+    expect(hasCollision(BLOCK_STONE)).toBe(true)
+    expect(canOcclude(BLOCK_STONE)).toBe(true)
+    expect(hasCollision(BLOCK_LEAVES)).toBe(true)
+    expect(canOcclude(BLOCK_LEAVES)).toBe(false)
+    expect(hasCollision(BLOCK_WATER)).toBe(false)
+    expect(canOcclude(BLOCK_WATER)).toBe(false)
+  })
+
+  it('destroyTime 对齐 MC 官方注册值,不可破坏为负', () => {
+    const byId = new Map(BLOCK_DEFS.map((d) => [d.name, d.destroyTime]))
+    expect(byId.get('stone')).toBe(1.5)
+    expect(byId.get('grass')).toBe(0.6)
+    expect(byId.get('dirt')).toBe(0.5)
+    expect(byId.get('sand')).toBe(0.5)
+    expect(byId.get('leaves')).toBe(0.2)
+    expect(byId.get('water')).toBeLessThan(0) // MC 水为流体,我们用负数标记不可破坏
   })
 
   it('未注册的 id / 名字查询抛错', () => {

@@ -18,6 +18,7 @@ PICKS=(
   "textures/block/grass_block_side.png"
   "textures/block/grass_block_side_overlay.png"
   "textures/block/dirt.png"
+  "textures/block/stone.png"
   "textures/colormap/grass.png"
 )
 

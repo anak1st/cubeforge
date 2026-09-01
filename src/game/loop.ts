@@ -4,11 +4,14 @@ import { stats } from './stats'
 const EMA_TAU_MS = 1000
 // 超过该间隔视为"非渲染间隔"（切页签、调试断点），不参与平滑，避免读数被打穿
 const GAP_SKIP_MS = 250
+// 固定步长（M1 逻辑 tick）：60Hz = 约 16.67ms
+const FIXED_DT_MS = 1000 / 60
 
 export interface MainLoopOptions {
-  /** M1：固定步长（60Hz）逻辑 tick，由累加器驱动；当前预留未接线 */
+  /** M1：固定步长（60Hz）逻辑 tick，由累加器驱动 */
   onTick?: (dtMs: number) => void
-  onRender: (timeMs: number) => void
+  /** alpha 是渲染插值因子（0..1）：前一 tick 与本帧 tick 位置之间的比例，用于平滑移动 */
+  onRender: (timeMs: number, alpha: number) => void
 }
 
 export interface MainLoop {
@@ -20,21 +23,24 @@ export interface MainLoop {
  * 本模块不认识 render/three——渲染经 onRender 注入；帧统计就地写入全局白板 game/stats.ts。
  */
 export function createMainLoop(options: MainLoopOptions): MainLoop {
+  const { onTick } = options
   let raf = 0
   let disposed = false
   let lastTime = 0
   let smoothMs = 0
   let windowStart = 0
   let ticks = 0
+  let accumulator = 0
 
   const frame = (now: number): void => {
     if (disposed) return
 
+    let dt = 0
     if (lastTime === 0) {
       // 首帧只对表：帧长与统计从下一帧起算，避免把启动等待算进去
       windowStart = now
     } else {
-      const dt = now - lastTime
+      dt = now - lastTime
       stats.frameMs = dt
 
       if (dt <= GAP_SKIP_MS) {
@@ -54,9 +60,15 @@ export function createMainLoop(options: MainLoopOptions): MainLoop {
     }
     lastTime = now
 
-    // M1 在此展开固定步长累加器：按 60Hz 补调 options.onTick 并 ticks++
+    // 固定步长累加器：按 60Hz 补调 onTick；余量钳制在 5 tick 内，卡顿后不追帧螺旋
+    accumulator = Math.min(accumulator + dt, FIXED_DT_MS * 5)
+    while (accumulator >= FIXED_DT_MS) {
+      if (onTick) onTick(FIXED_DT_MS)
+      accumulator -= FIXED_DT_MS
+      ticks++
+    }
 
-    options.onRender(now)
+    options.onRender(now, accumulator / FIXED_DT_MS)
     raf = requestAnimationFrame(frame)
   }
   raf = requestAnimationFrame(frame)
