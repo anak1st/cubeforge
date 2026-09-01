@@ -22,8 +22,10 @@
 
 - 工程骨架：Vite 8 + TypeScript strict + React 19 + Tailwind CSS 4 + three.js r185（pnpm，精确版本锁 `package.json`）
 - `src/render/scene.ts`：three.js 演示场景（黑底自转草方块，原版贴图 + 生物群系染色），`createDemoScene(canvas)` 返回 `{ renderFrame, dispose }`——场景不持有循环
-- `src/game/loop.ts`：主循环骨架（M0 提前落地的 M1 部分），全项目唯一 rAF；帧统计就地写入 `GameStats`（fps/frameMs/tps），固定步长累加器 M1 接入
-- `src/ui/`：`SceneCanvas`（装配点：注入 renderFrame、把 `GameStats` 交给角标）+ `FpsCounter`（500ms 拉取写 DOM）+ `App`（全屏容器 + 标题角标）
+- `src/game/loop.ts`：主循环骨架（M0 提前落地的 M1 部分），全项目唯一 rAF；固定步长累加器 M1 接入
+- `src/game/stats.ts`：全局帧统计白板（fps/frameMs/tps，fps 经 EMA 平滑），循环就地写入、UI 低频拉取
+- `src/game/game.ts`：唯一装配点 `createGame(canvas)`（场景 + 循环），纯 TS 无 hooks
+- `src/ui/`：`GameView`（React 拥有 canvas，effect 里 createGame/dispose）+ `FpsCounter`（500ms 拉取白板写 DOM）+ `App`（页面壳：画布/标题/角标为平级兄弟，M7 菜单照此加入）
 - 资源脚本：`scripts/fetch-mc-assets.{sh,ps1}`（固定版本 MC 资源全量解压到 `temp/minecraft/`，按原相对路径挑选到 `public/`；sh 跑在 Mac、ps1 跑在 Windows）、`scripts/fetch-refs.{sh,ps1}`（参考仓库最小克隆）
 - 里程碑进度与人工验收清单见 `docs/plan.md`，当前任务见 `TODO.md`
 
@@ -38,7 +40,8 @@ src/ui/       React 组件、zustand store    禁止 import three
 src/workers/  Worker 入口                  只消费 core
 ```
 
-- 依赖方向单向：`ui → game → core`，禁止反向、禁止跨层（如 `render → ui`）
+- 依赖方向单向：`ui → game → render → core`，禁止反向、禁止跨层（如 `render → ui`）
+- `src/ui/**` 禁止 import `three`；`src/game/**` 只经 `render` 间接使用 three，不得直接 import
 - ⚠️ **ESLint 分层禁令尚未配置**（TODO.md 任务）。配置完成前请自觉遵守：写 `core/` 代码时不得出现任何浏览器/渲染依赖
 - 每帧更新的数据（FPS、坐标显示）不得进入 React state——用 ref 直接写 DOM
 

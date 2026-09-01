@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
-import type { GameStats } from '../game/loop'
+import { stats } from '../game/stats'
 
-// FPS 角标：拉取主循环的 GameStats，500ms 写一次 DOM。数字不进 React state（AGENTS.md 约定）。
-export function FpsCounter({ stats }: { stats: GameStats }) {
+// FPS 角标：500ms 拉取全局白板写 DOM；数字不进 React state（AGENTS.md 约定）。
+export function FpsCounter() {
   const valueRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export function FpsCounter({ stats }: { stats: GameStats }) {
       el.textContent = String(stats.fps)
     }, 500)
     return () => window.clearInterval(timer)
-  }, [stats])
+  }, [])
 
   return (
     <div className="absolute right-4 top-3 text-sm font-medium text-neutral-500 tabular-nums select-none">

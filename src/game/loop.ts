@@ -1,18 +1,9 @@
-/**
- * 主循环：全项目唯一的 rAF 持有者（M0 提前落地的 M1 骨架）。
- * 渲染经 onRender 注入——game 层不 import render；帧统计就地写入 GameStats，UI 低频拉取。
- */
+import { stats } from './stats'
 
 // 帧长 EMA 的时间常数：约 1 秒。读数平稳可读，持续掉帧仍能在 1–2 秒内反映出来
 const EMA_TAU_MS = 1000
 // 超过该间隔视为"非渲染间隔"（切页签、调试断点），不参与平滑，避免读数被打穿
 const GAP_SKIP_MS = 250
-
-export interface GameStats {
-  fps: number // 渲染帧率：帧长 EMA 换算，刻意平滑——瞬时尖峰看 frameMs 或 DevTools
-  frameMs: number // 上一帧真实帧长（未平滑，调尖峰用）
-  tps: number // 逻辑 tick 率；固定步长累加器（M1）接入前恒为 0
-}
 
 export interface MainLoopOptions {
   /** M1：固定步长（60Hz）逻辑 tick，由累加器驱动；当前预留未接线 */
@@ -21,13 +12,14 @@ export interface MainLoopOptions {
 }
 
 export interface MainLoop {
-  readonly stats: GameStats
   dispose(): void
 }
 
+/**
+ * 主循环：全项目唯一的 rAF 持有者（M0 提前落地的 M1 骨架）。
+ * 本模块不认识 render/three——渲染经 onRender 注入；帧统计就地写入全局白板 game/stats.ts。
+ */
 export function createMainLoop(options: MainLoopOptions): MainLoop {
-  const stats: GameStats = { fps: 0, frameMs: 0, tps: 0 }
-
   let raf = 0
   let disposed = false
   let lastTime = 0
@@ -70,7 +62,6 @@ export function createMainLoop(options: MainLoopOptions): MainLoop {
   raf = requestAnimationFrame(frame)
 
   return {
-    stats,
     dispose() {
       disposed = true
       cancelAnimationFrame(raf)
