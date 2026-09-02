@@ -1,29 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppStore } from './store'
-import { MenuButton } from './MenuButton'
+import { PixielButton } from './PixielButton'
 import { requestLock } from './pointer-lock'
 
 // Chrome 在 ESC 退锁后约 1.25s 内强制拒绝一切重锁请求(防锁死陷阱),冷却结束前禁用"继续"
 const LOCK_COOLDOWN_MS = 1250
 
-/** 暂停菜单覆盖层:提供"继续"与"返回菜单";出现后先禁用"继续",重锁冷却结束自动恢复并聚焦。 */
+/** 暂停菜单覆盖层:提供"继续"与"返回菜单";出现后先禁用"继续",重锁冷却结束自动恢复。 */
 export function PauseMenu() {
   const backToMenu = useAppStore((s) => s.backToMenu)
   const [cooling, setCooling] = useState(true)
-  const [hint, setHint] = useState<string | null>(null)
-  const resumeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCooling(false)
-      resumeRef.current?.focus()
-    }, LOCK_COOLDOWN_MS)
+    const timer = setTimeout(() => setCooling(false), LOCK_COOLDOWN_MS)
     return () => clearTimeout(timer)
   }, [])
 
   const resume = (): void => {
-    setHint(null)
-    requestLock().catch(() => setHint('请稍候再试'))
+    requestLock().catch((err) => console.error('指针锁定失败', err))
   }
 
   return (
@@ -36,12 +30,11 @@ export function PauseMenu() {
     >
       <h2 className="pixel-text text-4xl text-neutral-100 select-none">已暂停</h2>
       <div className="flex flex-col gap-3">
-        <MenuButton ref={resumeRef} onClick={resume} disabled={cooling}>
+        <PixielButton onClick={resume} disabled={cooling}>
           继续
-        </MenuButton>
-        <MenuButton onClick={backToMenu}>返回菜单</MenuButton>
+        </PixielButton>
+        <PixielButton onClick={backToMenu}>返回菜单</PixielButton>
       </div>
-      {hint && <p className="text-sm text-amber-300 select-none">{hint}</p>}
     </div>
   )
 }
