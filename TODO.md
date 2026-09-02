@@ -7,6 +7,7 @@
 - 可玩切片已整体回退(设计文档保留于 docs/plan/,背景见 plan.md 关键决策记录)
 - 已落地、待人工验收:
   - M0 工程骨架
+  - M2 注册表:方块注册表(7 方块,数值对齐 MC)+ 外观映射 + 1/2/3 切换演示
   - M7 壳提前落地:UI 壳(应用状态机、开始/暂停画面、Pointer Lock 协议)→ `docs/plan/ui-shell.md`
   - 资源加载体系(MANIFEST + 紫黑棋盘降级)→ `docs/plan/assets.md`
 - M1-M10 其余部分未开始;旧 M2 验收记录与 tag 随回退作废

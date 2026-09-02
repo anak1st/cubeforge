@@ -111,7 +111,7 @@ MC 的"方块"是**三类东西叠加**，不是一个简单结构体：
 | `canOcclude` | `Properties.canOcclude`（渲染遮挡） | 单布尔，可行（树叶/walkable 与 occlude 是两个正交维度，我们目前用两布尔恰好能表达 leaves=碰撞+透剔） |
 | `destroyTime` | `Properties.destroyTime` | **数值已对齐 MC**（stone 1.5 / grass 0.6 / dirt 0.5 / sand 0.5 / leaves 0.2 / water 负数） |
 | — | `explosionResistance` | 未建（M6 后按需） |
-| — | 贴图/model 资源、tile 映射 | 目前在 `core/mesher.ts` 的 `tileFor` 硬编码，未进 BlockDef |
+| — | 贴图/model 资源、tile 映射 | 映射在 render 层（`textures.ts` 的 `materialsForBlock`），资源引用不进 core BlockDef（对齐 MC：资源是独立层） |
 
 ## 演进建议
 

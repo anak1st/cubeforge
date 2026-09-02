@@ -1,4 +1,8 @@
 import * as THREE from 'three'
+import { BLOCK_DIRT, BLOCK_GRASS, BLOCK_STONE } from '../core/blocks'
+
+// 原版草的颜色是生物群系色表在平原的采样值;M6 生物群系落地后再改为 colormap 采样
+const PLAINS_GREEN = '#91bd59'
 
 /** 贴图清单:语义键 → public/ 下的路径;新增方块贴图只改这里 */
 const MANIFEST = {
@@ -6,6 +10,7 @@ const MANIFEST = {
   grassSide: 'textures/block/grass_block_side.png',
   grassSideOverlay: 'textures/block/grass_block_side_overlay.png',
   dirt: 'textures/block/dirt.png',
+  stone: 'textures/block/stone.png',
 } as const
 
 /** 贴图语义键 */
@@ -95,4 +100,73 @@ export async function loadTextures(): Promise<TextureSet> {
     }),
   )
   return Object.fromEntries(entries) as TextureSet
+}
+
+/** 单个方块的外观:每面贴图键 + 染色信息(MC model faces 的简化版)。 */
+interface BlockAppearance {
+  top: TextureKey
+  side: TextureKey
+  bottom: TextureKey
+  /** 顶面染色:材质色与贴图相乘(MC 生物群系色) */
+  topTint?: string
+  /** 侧面灰度叠加层:染色后叠在 side 上(草皮沿口) */
+  sideOverlay?: TextureKey
+}
+
+// 外观映射放 render 层,core 注册表不含资源引用(对齐 MC:资源不进方块定义);
+// 无映射的方块(如 sand/leaves)渲染为紫黑棋盘,贴图就位后加一行即接入
+const APPEARANCE: Record<number, BlockAppearance> = {
+  [BLOCK_GRASS]: {
+    top: 'grassTop',
+    side: 'grassSide',
+    bottom: 'dirt',
+    topTint: PLAINS_GREEN,
+    sideOverlay: 'grassSideOverlay',
+  },
+  [BLOCK_DIRT]: { top: 'dirt', side: 'dirt', bottom: 'dirt' },
+  [BLOCK_STONE]: { top: 'stone', side: 'stone', bottom: 'stone' },
+}
+
+/** 方块六面材质组;dispose 释放本组新建的资源,不碰贴图集与共享棋盘。 */
+export interface BlockMaterials {
+  /** 材质槽顺序:+x -x +y -y +z -z */
+  materials: THREE.MeshLambertMaterial[]
+  dispose(): void
+}
+
+/** 生成方块六面材质;未映射方块全面紫黑棋盘。 */
+export function materialsForBlock(id: number, set: TextureSet): BlockMaterials {
+  const app = APPEARANCE[id]
+  if (!app) {
+    const mat = new THREE.MeshLambertMaterial({ map: missingTexture().texture })
+    return { materials: [mat, mat, mat, mat, mat, mat], dispose: () => mat.dispose() }
+  }
+
+  // 侧面 = 底图 + 染色后的草皮叠加层(复刻原版 grass_block 模型的两层结构)
+  const created: THREE.Texture[] = []
+  let sideMap = set[app.side].texture
+  if (app.sideOverlay) {
+    const canvas = document.createElement('canvas')
+    canvas.width = set[app.side].source.width
+    canvas.height = set[app.side].source.height
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(set[app.side].source, 0, 0)
+    ctx.drawImage(tinted(set[app.sideOverlay].source, PLAINS_GREEN), 0, 0)
+    sideMap = textureFrom(canvas)
+    created.push(sideMap)
+  }
+
+  const topMat = new THREE.MeshLambertMaterial({ map: set[app.top].texture })
+  if (app.topTint) topMat.color.set(app.topTint)
+  const sideMat = new THREE.MeshLambertMaterial({ map: sideMap })
+  const bottomMat = new THREE.MeshLambertMaterial({ map: set[app.bottom].texture })
+  return {
+    materials: [sideMat, sideMat, topMat, bottomMat, sideMat, sideMat],
+    dispose: () => {
+      created.forEach((tex) => tex.dispose())
+      topMat.dispose()
+      sideMat.dispose()
+      bottomMat.dispose()
+    },
+  }
 }
