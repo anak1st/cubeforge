@@ -1,12 +1,20 @@
 import * as THREE from 'three'
 
+/** 演示场景控制句柄。 */
+export interface DemoScene {
+  /** 设置方块是否自转;渲染循环持续运行。 */
+  setRunning(running: boolean): void
+  /** 停止渲染循环,移除窗口监听,释放全部 GPU 资源。 */
+  dispose(): void
+}
+
 /**
- * 在给定 canvas 上创建演示场景：黑底 + 单个自转方块（docs/plan.md M1 的临时展示物）。
- * 返回释放函数：回收全部 GPU 资源与监听器；canvas 本身归 React 所有，此处不碰 DOM。
+ * 创建演示场景(黑底 + 单个自转方块)并启动渲染循环。
+ * 初始化渲染器、相机、灯光与方块,注册窗口缩放监听,返回控制句柄。
  */
-export function createDemoScene(canvas: HTMLCanvasElement): () => void {
+export function createDemoScene(canvas: HTMLCanvasElement): DemoScene {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // 高分屏上限 2：再高只烧性能
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // 高分屏上限 2:再高只烧性能
   renderer.setSize(window.innerWidth, window.innerHeight)
 
   const scene = new THREE.Scene()
@@ -21,10 +29,10 @@ export function createDemoScene(canvas: HTMLCanvasElement): () => void {
   camera.position.set(3, 3, 3)
   camera.lookAt(0, 0, 0)
 
-  // 灯光不是"看见方块"的必需品，是"看出六个面明暗"的必需品
+  // 灯光不是"看见方块"的必需品,是"看出六个面明暗"的必需品
   scene.add(new THREE.AmbientLight(0xffffff, 0.6))
-  const sun = new THREE.DirectionalLight(0xffffff, 2) // r155+ 物理光照，强度是线性倍率
-  sun.position.set(5, 10, 7) // 平行光只取方向，位置远近不影响亮度
+  const sun = new THREE.DirectionalLight(0xffffff, 2) // r155+ 物理光照,强度是线性倍率
+  sun.position.set(5, 10, 7) // 平行光只取方向,位置远近不影响亮度
   scene.add(sun)
 
   const geometry = new THREE.BoxGeometry(1, 1, 1)
@@ -39,16 +47,27 @@ export function createDemoScene(canvas: HTMLCanvasElement): () => void {
   }
   window.addEventListener('resize', onResize)
 
+  let running = true
+  let lastTime = 0
   renderer.setAnimationLoop((time) => {
-    cube.rotation.y = time * 0.0004 // time 为毫秒；缓慢自转证明是实时 3D 而非贴图
-    renderer.render(scene, camera)
+    if (lastTime === 0) lastTime = time
+    const dt = Math.min(time - lastTime, 50) // 页面隐藏时 rAF 停摆,恢复帧 dt 截断,自转不突进
+    lastTime = time
+    // 增量累进而非 time 直算:暂停恢复后不会因时间流逝跳变角度
+    if (running) cube.rotation.y += dt * 0.0004
+    renderer.render(scene, camera) // 暂停时冻结自转但保持渲染,对齐 MC 暂停观感
   })
 
-  return () => {
-    renderer.setAnimationLoop(null)
-    window.removeEventListener('resize', onResize)
-    geometry.dispose()
-    material.dispose()
-    renderer.dispose()
+  return {
+    setRunning(value: boolean): void {
+      running = value
+    },
+    dispose(): void {
+      renderer.setAnimationLoop(null)
+      window.removeEventListener('resize', onResize)
+      geometry.dispose()
+      material.dispose()
+      renderer.dispose()
+    },
   }
 }

@@ -1,16 +1,34 @@
 import { useEffect, useRef } from 'react'
-import { createDemoScene } from '../render/scene'
+import { createDemoScene, type DemoScene } from '../render/scene'
+import { requestLock, setLockTarget } from './pointer-lock'
+import { useAppStore } from './store'
 
-// three 场景的 React 承载范式：<canvas> 写在 JSX 里归 React 管，three 只在 effect 里往里画。
-// createDemoScene 的释放函数恰好作 effect cleanup 返回，天然兼容 StrictMode 双挂载。
+/**
+ * 游戏画面承载组件:创建演示场景并启动渲染,挂载时请求指针锁,
+ * 按应用状态控制场景运行(playing)或冻结(paused),卸载时释放资源。
+ */
 export function SceneCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const sceneRef = useRef<DemoScene | null>(null)
+  const appState = useAppStore((s) => s.appState)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    return createDemoScene(canvas)
+    setLockTarget(canvas)
+    const scene = createDemoScene(canvas)
+    sceneRef.current = scene
+    requestLock().catch(() => useAppStore.getState().pause())
+    return () => {
+      sceneRef.current = null
+      setLockTarget(null)
+      scene.dispose()
+    }
   }, [])
+
+  useEffect(() => {
+    sceneRef.current?.setRunning(appState === 'playing')
+  }, [appState])
 
   return <canvas ref={canvasRef} className="block" />
 }

@@ -4,7 +4,7 @@ import { REVISION } from 'three'
 import './index.css'
 import App from './ui/App.tsx'
 
-// three.js 集成冒烟：M1 将建立正式场景（docs/plan.md）
+// three.js 集成冒烟:打印版本号确认依赖可用
 console.info(`[cubeforge] three.js r${REVISION}`)
 
 createRoot(document.getElementById('root')!).render(
