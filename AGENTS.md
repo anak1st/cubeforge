@@ -44,13 +44,14 @@ pnpm typecheck   # tsc -b
 
 1. `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿
 2. `src/core/` 的每个新算法/数据结构都有对应 vitest 用例
-3. 人工验收清单（`docs/plan.md` 对应里程碑章节）全部通过
-4. `TODO.md` 勾选完成项；`docs/qa/Mxx.md` 写验收记录；`git tag Mxx`
+3. 人工验收清单（`docs/plan/plan.md` 对应里程碑章节）全部通过
+4. `TODO.md` 勾选完成项；`docs/impl/Mxx.md` 写验收记录；`git tag Mxx`
 
 ## 工作流：里程碑制
 
-- `docs/plan.md` 是唯一事实源：里程碑顺序、任务、人工验收清单都以它为准；当前任务与进度见 `TODO.md`
-- 一个里程碑 ≈ 一次 AI 会话的范围；开场读 plan.md 对应章节 + 本文件
+- `docs/plan/plan.md` 是唯一事实源：里程碑顺序、任务、人工验收清单都以它为准；设计文档在 `docs/plan/`；当前任务与进度见 `TODO.md`
+- 一个里程碑 ≈ 一次 AI 会话的范围；开场读 plan/plan.md 对应章节 + 本文件
+- 文档组织只分三块：`docs/refs/`（外部资料与分析）、`docs/plan/`（计划与设计，已实现的只留框架）、`docs/impl/`（实现记录，尽量少写——细节跟代码注释走）
 - **人的角色是验收员**：AI 产出代码 + 测试 + "待验收"状态，人按清单在浏览器里操作并记录
 - 验收不通过时，修复会话只修清单上的失败项，不做清单之外的重构
 
@@ -58,7 +59,7 @@ pnpm typecheck   # tsc -b
 
 - 遵循模板既有 ESLint 规则；不新增风格类规则
 - 不写 `any`（用 `unknown` + 收窄，或具体类型）
-- 注释只写"为什么/约束"，不写"这段代码在做什么"；公开 API 写 TSDoc 一行
+- 类/接口/组件/函数前写一行"做什么"的说明注释；函数体内只写承重的约束（数值、浏览器行为等），不写叙述性"为什么"
 - 提交信息用中文，格式 `feat|fix|docs|test|refactor: 描述`；里程碑完成打 `Mxx` tag
 
 ## 依赖门禁

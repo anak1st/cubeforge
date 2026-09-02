@@ -22,7 +22,7 @@ pnpm test       # vitest
 pnpm typecheck  # tsc -b
 ```
 
-里程碑路线、进度与人工验收清单见 [docs/plan.md](docs/plan.md)，当前任务见 [TODO.md](TODO.md)。
+里程碑路线、进度与人工验收清单见 [docs/plan/plan.md](docs/plan/plan.md)，当前任务见 [TODO.md](TODO.md)。
 
 ## 许可证
 

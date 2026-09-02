@@ -1,29 +1,29 @@
 # cubeforge 开发计划
 
-> **技术栈**：浏览器 · TypeScript(strict) + Vite + three.js + React 19 · 单机、无联机、无 mod、桌面键鼠（硬约束见 [AGENTS.md](../AGENTS.md)）。
+> **技术栈**：浏览器 · TypeScript(strict) + Vite + three.js + React 19 · 单机、无联机、无 mod、桌面键鼠（硬约束见 [AGENTS.md](../../AGENTS.md)）。
 > **架构分层**：`core/`（纯逻辑）→ `render/`（three）→ `game/`（循环/输入/存档）→ `ui/`（React），依赖单向；`workers/` 只消费 core。
-> **参照策略**：**世界行为以 Minecraft 官方源码为准**——机制规格、数值、手感基准一律先查 `temp/minecraft-src/`（模块地图见 [refs/minecraft.md](refs/minecraft.md)）；性能与工程手法参考 Luanti（`refs/luanti`）与 Voxelize（`refs/voxelize`）。
+> **参照策略**：**世界行为以 Minecraft 官方源码为准**——机制规格、数值、手感基准一律先查 `temp/minecraft-src/`（模块地图见 [refs/minecraft.md](../refs/minecraft.md)）；性能与工程手法参考 Luanti（`refs/luanti`）与 Voxelize（`refs/voxelize`）。
 > **审核原则**：人按各里程碑"验收要点"在浏览器里过一遍；性能类指标写明看 DevTools 哪个数字；不验收代码风格。
 
 ## 通用完成定义
 
 1. `pnpm lint && pnpm typecheck && pnpm test && pnpm build` 全绿。
 2. `src/core/` 每个新算法有 vitest 用例；core 无 three/DOM 依赖。
-3. 验收要点逐条通过，记录 `docs/qa/Mxx.md`，打 `git tag Mxx`。
+3. 验收要点逐条通过，记录 `docs/impl/Mxx.md`，打 `git tag Mxx`。
 4. 一个里程碑 ≈ 一次 AI 会话：开场读本文对应章节 + AGENTS.md + minecraft.md 的对应模块指引。
 
 ## 里程碑总览
 
 | # | 名称 | 产出 | 状态 |
 |---|---|---|---|
-| M0 | 工程骨架与开发回路 | 可跑的空壳 | ✅（Tweakpane、验收记录挂账至 M1） |
-| M1 | 场景 / 相机 / 调试面板 | 看得见的 3D 世界 | 🔶 场景与主循环已提前落地 |
-| M2 | 世界数据模型（纯逻辑） | core 层 + 测试 | 🔶 已实现，待人工验收 |
+| M0 | 工程骨架与开发回路 | 可跑的空壳 | ✅ |
+| M1 | 场景 / 相机 / 调试面板 | 看得见的 3D 世界 | |
+| M2 | 世界数据模型（纯逻辑） | core 层 + 测试 | |
 | M3 | 网格化与面剔除 | 方块长出三角形 | |
 | M4 | 无限世界与流式加载 | 走不到边的地形 | |
 | M5 | 第一人称：移动 / 碰撞 / 挖放 | 手感闭环 | |
 | M6 | 光照与昼夜 | 明暗世界 | |
-| M7 | UI 与存档 | 菜单 / 设置 / 存档 | |
+| M7 | UI 与存档 | 菜单 / 设置 / 存档 | 🔶 壳已提前实现（见 plan/ui-shell.md） |
 | M8 | 物品 / 背包 / 合成 | 游戏性闭环 | |
 | M9 | 音效 / 粒子 / 水 / 树 | "像一款游戏" | |
 | M10 | 玩法原型 + 性能 + 分发 | 可分享链接 | |
@@ -34,6 +34,7 @@
 - **存档 = 生成即冻结**（2026-09-01，对齐 MC）：chunk 首次生成即持久化，之后仅脏块重写；不用"只存差异"。元信息记 `generatorVersion` 与数据格式版本，为算法升级 / 数据迁移留钩子（对应 MC 的 DataVersion / blending）。
 - **存储起点**：`Uint16Array` 直存 id（≈ MC GlobalPalette 的退化形态）；M4 视需要上调色板压缩。
 - **光照直接双通道**（0..15，天空光 / 方块光分开存）：先正确 BFS，再谈增量优化。
+- **回退重做**（2026-09-02）：可玩切片（M1 场景 / M2 数据模型 / 切片游戏层）整体回退——多处分式设计不佳；设计文档保留于本目录，代码自 M0 演示重新生长。同日提前落地 M7 的 UI 壳（应用状态机、开始/暂停画面）与资源加载体系。
 
 ## 各里程碑
 
@@ -41,7 +42,7 @@
 
 ### M0 · 工程骨架 ✅
 
-工具链（Vite / TS / ESLint / vitest）、分层目录、开发回路（HMR + FPS 白板 + 测试回路）。挂账：Tweakpane 面板与 M0 验收记录（与 M1 一并完成）。
+工具链、分层目录、开发回路已就绪。挂账：Tweakpane 面板与 M0 验收记录（与 M1 一并完成）。
 
 ### M1 · 场景、相机与调试面板
 
@@ -91,6 +92,7 @@
 - **范围**：zustand 状态机（menu / playing / paused / settings）；像素风 UI；Pointer Lock 生命周期；IndexedDB 存档（**生成即冻结** + `generatorVersion`，blob 压缩，定期 / 失焦回写）；设置持久化 localStorage。
 - **MC 参考**：存档语义对齐 MC（取舍见 minecraft.md 与关键决策记录）；UI 无官方对应，自建。
 - **验收**：新建世界 → 玩 → 退出 → 重进全流程；改动 / 位置 / 时间保持；设置即时生效且刷新保留；删除世界生效；走远触发卸载再走回，地形与离开时一致。
+- **进度**（2026-09-02 提前落地）：应用状态机（menu/playing/paused）、开始/暂停画面、像素风按钮、Pointer Lock 协议与资源加载已实现，见 [ui-shell.md](ui-shell.md) 与 [assets.md](assets.md)；剩余：settings 态、存档、设置持久化、全面像素化。
 
 ### M8 · 物品、背包与合成
 

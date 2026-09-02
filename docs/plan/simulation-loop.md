@@ -120,6 +120,5 @@
 
 ## 关联
 
-- `docs/design/blocks.md`（方块定义维度，Blocks 侧）
-- `src/game/loop.ts` / `camera.ts` / `game.ts`（当前实现：60Hz tick + prev/current 插值，待按本报告重构）
+- `docs/plan/blocks.md`（方块定义维度，Blocks 侧）
 - `docs/refs/minecraft.md`、`docs/refs/voxelize.md`、`docs/refs/luanti.md`
