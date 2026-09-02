@@ -34,12 +34,7 @@ export function PauseMenu() {
         bg-black/50 backdrop-blur-sm
       "
     >
-      <h2
-        className="text-3xl font-bold tracking-[0.3em] text-neutral-100 select-none"
-        style={{ textShadow: '3px 3px 0 rgba(0, 0, 0, 0.8)' }}
-      >
-        已暂停
-      </h2>
+      <h2 className="pixel-text text-4xl text-neutral-100 select-none">已暂停</h2>
       <div className="flex flex-col gap-3">
         <MenuButton ref={resumeRef} onClick={resume} disabled={cooling}>
           继续

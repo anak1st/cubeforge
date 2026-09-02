@@ -19,8 +19,8 @@ export function MenuButton({ children, onClick, autoFocus, disabled, ref }: Menu
       disabled={disabled}
       ref={ref}
       className="
-        w-72 border-2 border-black bg-neutral-600
-        px-6 py-2.5 text-lg font-semibold tracking-wider text-neutral-100
+        pixel-text flex h-[60px] w-72 items-center justify-center
+        border-2 border-black bg-neutral-600 px-6 text-2xl text-neutral-100
         select-none
         hover:bg-neutral-500
         focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white
@@ -29,9 +29,8 @@ export function MenuButton({ children, onClick, autoFocus, disabled, ref }: Menu
       "
       style={
         disabled
-          ? { boxShadow: 'none', textShadow: 'none' }
+          ? { boxShadow: 'none' }
           : {
-              textShadow: '2px 2px 0 rgba(0, 0, 0, 0.6)',
               boxShadow: 'inset 0 2px 0 rgba(255, 255, 255, 0.22), inset 0 -4px 0 rgba(0, 0, 0, 0.4)',
             }
       }

@@ -6,3 +6,21 @@ body,
 #root {
   height: 100%;
 }
+
+/* Fusion Pixel 像素字体（OFL-1.1，许可 licenses/fusion-pixel.txt），12px 栅格：字号须为 12 的整数倍 */
+@font-face {
+  font-family: 'Fusion Pixel';
+  src: url('/fonts/fusion-pixel.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+/* 像素文字：关抗锯齿，行高等于字号；文字阴影偏移 1/12 em、颜色为文字色 25% 亮度（MC 规则） */
+.pixel-text {
+  font-family: 'Fusion Pixel', monospace;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: none;
+  text-shadow: calc(1em / 12) calc(1em / 12) 0 color-mix(in srgb, currentColor 25%, #000);
+}
