@@ -1,68 +1,36 @@
-/**
- * 世界场景:在给定 canvas 上建起 renderer/scene/camera/灯光与单个 chunk 网格。
- * 相机归 game/CameraController 驱动;本模块只负责 three 装配与渲染,canvas 归 React 所属,不碰 DOM 事件。
- */
 import * as THREE from 'three'
-import { buildChunkMesh } from '../core/mesher'
-import { buildChunkGeometry } from './chunkMesh'
-import { buildGrassAtlas } from './textures'
-
-export interface WorldScene {
-  camera: THREE.PerspectiveCamera
-  renderFrame(timeMs: number): void
-  dispose(): void
-}
 
 /**
- * @param getBlock 世界坐标 → 方块 id(Core 世界访问器,越界返回空气),供网格化采样。
+ * 在给定 canvas 上创建演示场景：黑底 + 单个自转方块（docs/plan.md M1 的临时展示物）。
+ * 返回释放函数：回收全部 GPU 资源与监听器；canvas 本身归 React 所有，此处不碰 DOM。
  */
-export function createWorldScene(
-  canvas: HTMLCanvasElement,
-  getBlock: (x: number, y: number, z: number) => number,
-): WorldScene {
+export function createDemoScene(canvas: HTMLCanvasElement): () => void {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // 高分屏上限 2：再高只烧性能
   renderer.setSize(window.innerWidth, window.innerHeight)
 
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x87ceeb) // 天空淡蓝
-  scene.fog = new THREE.Fog(0x87ceeb, 40, 90)
+  scene.background = new THREE.Color(0x000000)
 
   const camera = new THREE.PerspectiveCamera(
     70,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000,
+    100,
   )
-  camera.position.set(7.5, 14, 26)
-  camera.lookAt(7.5, 3, 7.5)
+  camera.position.set(3, 3, 3)
+  camera.lookAt(0, 0, 0)
 
-  // 灯光:环境光保底,平行光带明暗;强度用 r155+ 物理光照的线性倍率
+  // 灯光不是"看见方块"的必需品，是"看出六个面明暗"的必需品
   scene.add(new THREE.AmbientLight(0xffffff, 0.6))
-  const sun = new THREE.DirectionalLight(0xffffff, 2)
-  sun.position.set(12, 20, 10)
+  const sun = new THREE.DirectionalLight(0xffffff, 2) // r155+ 物理光照，强度是线性倍率
+  sun.position.set(5, 10, 7) // 平行光只取方向，位置远近不影响亮度
   scene.add(sun)
 
-  const disposables: { dispose(): void }[] = []
-  let disposed = false
-  let mesh: THREE.Mesh | undefined
-
-  // 图集异步合成,就绪后把 chunk 网格装进场景(网格生成是纯函数,core 侧)
-  void buildGrassAtlas()
-    .then(({ texture }) => {
-      if (disposed) {
-        texture.dispose()
-        return
-      }
-      const geometry = buildChunkGeometry(buildChunkMesh(getBlock))
-      const material = new THREE.MeshLambertMaterial({ map: texture })
-      mesh = new THREE.Mesh(geometry, material)
-      disposables.push(geometry, material, texture)
-      scene.add(mesh)
-    })
-    .catch((err: unknown) => {
-      console.error('[cubeforge]', err)
-    })
+  const geometry = new THREE.BoxGeometry(1, 1, 1)
+  const material = new THREE.MeshLambertMaterial({ color: 0x44aa44 })
+  const cube = new THREE.Mesh(geometry, material)
+  scene.add(cube)
 
   const onResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight
@@ -71,17 +39,16 @@ export function createWorldScene(
   }
   window.addEventListener('resize', onResize)
 
-  return {
-    camera,
-    renderFrame(): void {
-      renderer.render(scene, camera)
-    },
-    dispose() {
-      disposed = true
-      window.removeEventListener('resize', onResize)
-      if (mesh) scene.remove(mesh)
-      for (const d of disposables) d.dispose()
-      renderer.dispose()
-    },
+  renderer.setAnimationLoop((time) => {
+    cube.rotation.y = time * 0.0004 // time 为毫秒；缓慢自转证明是实时 3D 而非贴图
+    renderer.render(scene, camera)
+  })
+
+  return () => {
+    renderer.setAnimationLoop(null)
+    window.removeEventListener('resize', onResize)
+    geometry.dispose()
+    material.dispose()
+    renderer.dispose()
   }
 }
