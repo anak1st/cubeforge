@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { BLOCK_DIRT, BLOCK_GRASS, BLOCK_STONE } from '../core/blocks'
 import { createDemoScene, type DemoScene } from '../render/scene'
 import { loadTextures } from '../render/textures'
-import { requestLock, setLockTarget } from './pointer-lock'
+import { requestLock, setLockTarget } from '../game/pointer-lock'
 import { useAppStore } from './store'
 
 // 演示方块的切换键(仅 playing 态生效);M5 输入层建立后迁入 game 层

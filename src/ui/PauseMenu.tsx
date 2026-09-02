@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from './store'
 import { PixielButton } from './PixielButton'
-import { requestLock } from './pointer-lock'
+import { requestLock } from '../game/pointer-lock'
 
 // Chrome 在 ESC 退锁后约 1.25s 内强制拒绝一切重锁请求(防锁死陷阱),冷却结束前禁用"继续"
 const LOCK_COOLDOWN_MS = 1250
