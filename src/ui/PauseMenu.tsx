@@ -25,10 +25,10 @@ export function PauseMenu() {
       className="
         absolute inset-0 z-10
         flex flex-col items-center justify-center gap-8
-        bg-black/50 backdrop-blur-sm
+        bg-black/50 backdrop-blur-md
       "
     >
-      <h2 className="pixel-text text-4xl text-neutral-100 select-none">已暂停</h2>
+      <h2 className="pixel-text text-4xl text-white select-none">已暂停</h2>
       <div className="flex flex-col gap-3">
         <PixielButton onClick={resume} disabled={cooling}>
           继续
