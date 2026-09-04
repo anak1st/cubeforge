@@ -1,19 +1,19 @@
 # TODO — 当前进度
 
-> 计划与设计见 `docs/plan/plan.md`;实现细节跟代码注释走;里程碑人工验收结论记 `docs/impl/Mxx.md`。
+> 计划与设计唯一入口 `docs/plan/plan.md`(跨里程碑定案在其"架构定案"节,其余按里程碑内嵌);实现细节跟代码注释走;里程碑人工验收结论记 `docs/impl/Mxx.md`。
 
-## 当前状态(2026-09-02)
+## 当前状态(2026-09-05)
 
-- 可玩切片已整体回退(设计文档保留于 docs/plan/,背景见 plan.md 关键决策记录)
+- 可玩切片已整体回退,代码自 M0 演示重新生长(背景见 plan.md 决策记录)
 - 已落地、待人工验收:
-  - M0 工程骨架
+  - M0 工程骨架 + 资源加载体系(MANIFEST + 紫黑棋盘降级)
   - M2 注册表:方块注册表(7 方块,数值对齐 MC)+ 外观映射 + 1/2/3 切换演示
-  - M7 壳提前落地:UI 壳(应用状态机、开始/暂停画面、Pointer Lock 协议)→ `docs/plan/ui-shell.md`
-  - 资源加载体系(MANIFEST + 紫黑棋盘降级)→ `docs/plan/assets.md`
-- M1-M10 其余部分未开始;旧 M2 验收记录与 tag 随回退作废
+  - M7 壳:应用状态机 v1(开始/暂停画面、指针锁 v1)
+  - 状态架构(2026-09-05 重构):游戏数据存全局单例 store(src/game/store.ts),UI 只调语义 action(src/game/controller.ts),指针锁是切换状态的副作用;跨目录 import 用 @/ 别名
+- 其余(M1、M2 chunk/World、M3-M10)未开始
 
 ## 下一步(方向待定,候选)
 
-- M1 场景/相机/调试面板重做
-- M2 世界数据模型重做(设计见 docs/plan/blocks.md)
+- M1 场景/相机/调试面板重做(相机走渲染帧,依据 refs/loop-camera.md)
+- M2 世界数据模型(chunk/World,设计见 plan.md M2 节)
 - M3 网格化与面剔除

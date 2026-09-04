@@ -120,5 +120,5 @@
 
 ## 关联
 
-- `docs/plan/blocks.md`（方块定义维度，Blocks 侧）
+- `docs/refs/mc-block-properties.md`（方块定义维度，Blocks 侧）
 - `docs/refs/minecraft.md`、`docs/refs/voxelize.md`、`docs/refs/luanti.md`
